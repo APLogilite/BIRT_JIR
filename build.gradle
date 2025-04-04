@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // You can add other dependencies if you want, or just include an empty JAR for this purpose.
+}
+
+task downloadJars(type: Copy) {
+    from 'libs' // From the libs directory
+    into 'build/libs' // To the build/libs directory
+}
+
+build.dependsOn downloadJars // Ensure the downloadJars task runs during the build
+
