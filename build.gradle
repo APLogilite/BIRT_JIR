@@ -29,7 +29,7 @@ task packageJar(type: Jar) {
 
     // Optionally specify the name of the JAR file
     archiveBaseName = 'BIRT_JIR'
-    version = '1.0'
+    // version = '1.0'
     archiveClassifier = '' // No classifier for the final jar (default behavior)
 }
 
