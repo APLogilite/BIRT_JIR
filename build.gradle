@@ -3,17 +3,50 @@ plugins {
 }
 
 repositories {
-    mavenCentral()
+    mavenCentral() // Include Maven Central repository if needed for other dependencies
 }
 
 dependencies {
-    // You can add other dependencies if you want, or just include an empty JAR for this purpose.
+    // Include all JAR files from the 'lib' directory into the runtime classpath
+    implementation fileTree(dir: 'lib', include: ['*.jar'])
 }
 
-task downloadJars(type: Copy) {
-    from 'libs' // From the libs directory
-    into 'build/libs' // To the build/libs directory
+task copyLibJars(type: Copy) {
+    // Copy JAR files from the 'lib' directory to a temporary directory
+    from 'lib' // From the 'lib' directory
+    include '**/*.jar' // Include all JAR files
+    into "$buildDir/tempLib" // Temporary folder to copy the JARs
 }
 
-build.dependsOn downloadJars // Ensure the downloadJars task runs during the build
+task packageJar(type: Jar) {
+    // Include compiled classes and resources in the JAR
+    from sourceSets.main.output
+
+    // After copying, include the JARs into the final JAR
+    from("$buildDir/tempLib") {  // Ensure files are taken from the tempLib folder
+        into 'META-INF/lib'  // Place them directly into META-INF/lib in the final JAR
+    }
+
+    // Optionally specify the name of the JAR file
+    archiveBaseName = 'BIRT_JIR'
+    version = '1.0'
+    archiveClassifier = '' // No classifier for the final jar (default behavior)
+}
+
+// Ensure the 'copyLibJars' task runs before the 'packageJar' task
+packageJar.dependsOn copyLibJars
+
+task buildJAR {
+    dependsOn packageJar  // Ensure that the JAR is built
+}
+
+build.dependsOn buildJAR // Ensure that the build depends on the JAR being built
+
+// Cleanup task to delete temporary files (like tempLib) after building the JAR
+task cleanup(type: Delete) {
+    delete "$buildDir/tempLib" // Delete the temporary lib folder
+}
+
+// Ensure the cleanup task runs after the build
+build.finalizedBy cleanup
 
