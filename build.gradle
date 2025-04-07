@@ -36,10 +36,11 @@ task packageJar(type: Jar) {
 // Ensure the 'copyLibJars' task runs before the 'packageJar' task
 packageJar.dependsOn copyLibJars
 
-// Build JAR task to ensure that the JAR is built
 task buildJAR {
     dependsOn packageJar  // Ensure that the JAR is built
 }
+
+build.dependsOn buildJAR // Ensure that the build depends on the JAR being built
 
 // Cleanup task to delete temporary files (like tempLib) after building the JAR
 task cleanup(type: Delete) {
